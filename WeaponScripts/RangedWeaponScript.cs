@@ -5,8 +5,7 @@ using UnityEngine;
 public class RangedWeaponScript:MonoBehaviour{
     private ProjectileSpawner spawnProj;
     public PlayerController playerController;
-
-    private Transform weaponTransform;
+    public CameraController cameraController;
 
     [Header("Weapon Modules")]
     public GameObject barrelModule;
@@ -46,9 +45,13 @@ public class RangedWeaponScript:MonoBehaviour{
     public float numberOfProj;
     public bool bleedDebuff;
 
+    [Header("Currently Used Ammo")]
+    public string currentAmmo;
+
     private void Start(){
         spawnProj=GetComponent<ProjectileSpawner>();
-        weaponTransform=this.transform;
+        playerController=this.transform.parent.gameObject.GetComponent<PlayerController>();
+        cameraController=this.transform.parent.gameObject.GetComponent<PlayerController>().cameraController;
         barrelModule=this.transform.GetChild(0).gameObject;
         bodyModule=this.transform.GetChild(1).gameObject;
         ammoModule=this.transform.GetChild(2).gameObject;
@@ -57,13 +60,20 @@ public class RangedWeaponScript:MonoBehaviour{
 
         ExtractModuleStats();
         AttachModules();
+
+        numOfCurrentBullets=magSize;
     }
 
     private void Update(){
-        if(Input.GetKeyDown(KeyCode.Mouse0)){
+        if(Input.GetKeyDown(KeyCode.Mouse0)&&numOfCurrentBullets!=0){
+            numOfCurrentBullets-=1;
             spawnProj.currentOrientation=projSpawnPos[0];
             spawnProj.SpawnProjectile(this,numberOfProj,numOfBarrels,projSpawnPos);
-            StartCoroutine(ApplyRecoil());
+            RecoilForce();
+        }
+
+        if(Input.GetKeyDown(KeyCode.R)){
+            numOfCurrentBullets=magSize;
         }
     }
 
@@ -100,6 +110,10 @@ public class RangedWeaponScript:MonoBehaviour{
         sightModule.transform.position=sightAttachPoint.position;
     }
 
+    private void GetAmmuntionStats(){
+        
+    }
+
     public void RecoilForce(){
         float recoilForce=recoil-weaponStability;
         
@@ -107,14 +121,10 @@ public class RangedWeaponScript:MonoBehaviour{
             recoilForce=0;
         }
 
-        weaponTransform.Rotate(-weaponTransform.rotation.x-recoilForce,0,0,Space.Self);
+        cameraController.camXRot=cameraController.camXRot+-recoilForce*0.2f;
     }
 
-    public IEnumerator ApplyRecoil(){
-        yield return new WaitForSeconds(0.2f);
-        RecoilForce();
-        yield return new WaitForSeconds(0.2f);
-        float recoilForce=recoil-weaponStability;
-        weaponTransform.Rotate(weaponTransform.rotation.x+recoilForce,0,0,Space.Self);
+    public bool IsInMadness(){
+        return playerController.CurrentMadnessState();
     }
 }

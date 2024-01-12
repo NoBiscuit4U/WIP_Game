@@ -6,12 +6,13 @@ public class CameraController:MonoBehaviour{
     public Transform orientation;
     public Transform playerCameraPos;
     public Transform cameraPos;
+    public Transform cameraTransform;
     
     public float xSens;
     public float ySens;
 
-    float camXRot;
-    float camYRot;
+    public float camXRot;
+    public float camYRot;
 
     private void Start(){
         Cursor.lockState= CursorLockMode.Locked;
@@ -25,9 +26,9 @@ public class CameraController:MonoBehaviour{
         camYRot+=mouseX;
         camXRot-=mouseY;
 
-        camXRot= Mathf.Clamp(camXRot,-90f,90f);
+        camXRot=Mathf.Clamp(camXRot,-90f,90f);
         
-        transform.rotation=Quaternion.Euler(camXRot,camYRot,0);
+        playerCameraPos.rotation=Quaternion.Euler(camXRot,camYRot,0);
         orientation.rotation=Quaternion.Euler(0,camYRot,0);
 
         playerCameraPos.position=cameraPos.position;

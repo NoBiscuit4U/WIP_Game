@@ -20,8 +20,9 @@ public class ProjectileSpawner:MonoBehaviour{
 
         for(int i=0;i<numOfProj;i++){
             for(int x=0;x<numOfBarrels;x++){
-                spawnPos[x]=ManageProjSpread(currentOrientation);
+                ManageProjSpread(RWScript);
                 Instantiate(newProjObj,spawnPos[x].position,spawnPos[x].rotation);
+                currentOrientation.Rotate(0,0,0,Space.Self);
             }
         }
     }
@@ -33,15 +34,15 @@ public class ProjectileSpawner:MonoBehaviour{
         projScript.bleedDebuff=RWScript.bleedDebuff;
         projScript.launchOrientation=currentOrientation;
         projScript.projVelocity=RWScript.projVelocity;
+        projScript.isInMadness=RWScript.IsInMadness();
         return projObj;
     }
 
-    public Transform ManageProjSpread(Transform pos){
-        float xPos=Random.Range(9f,10f);
-        float yPos=Random.Range(9f,10f);
-        float zPos=Random.Range(9f,10f);
+    public void ManageProjSpread(RangedWeaponScript RWScript){
+        float xPos=Random.Range(-12f+RWScript.accuracy,12f-RWScript.accuracy);
+        float yPos=Random.Range(-12f+RWScript.accuracy,12f-RWScript.accuracy);
+        float zPos=Random.Range(-12f+RWScript.accuracy,12f-RWScript.accuracy);
 
-        pos.rotation.eulerAngles.Set(currentOrientation.rotation.x*xPos,currentOrientation.rotation.y*yPos,currentOrientation.rotation.z*zPos);
-        return pos;
+        currentOrientation.Rotate(currentOrientation.rotation.x*xPos,currentOrientation.rotation.y*yPos,currentOrientation.rotation.z*zPos,Space.Self);
     }
 }

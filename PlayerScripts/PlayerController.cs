@@ -6,8 +6,10 @@ public class PlayerController:MonoBehaviour{
     private Rigidbody rigidbody;
     private CapsuleCollider collider;
 
-    private SlidingController slidingController;
-    private CameraController cameraController;
+    public CameraController cameraController;
+
+    SlidingController slidingController;
+    SanityHandler sanityHandler;
 
     public Transform orientation;
     public Transform weaponHoldPos;
@@ -73,6 +75,14 @@ public class PlayerController:MonoBehaviour{
     public GameObject playerHeldWeapon;
     private Transform weaponTransform;
 
+    [Header("Held Ammunition")]
+    public bool doesHaveBaseAmmunition;
+    public bool doesHaveBleedAmmunition;
+
+    [Header("Amount of Ammunition Held")]
+    public float baseAmmunitionHeld;
+    public float bleedAmmunitionHeld;
+
 
     public enum MovementState{
         WALKING,RUNNING,CROUCHED,SLIDING,WALLRUNNING
@@ -83,8 +93,8 @@ public class PlayerController:MonoBehaviour{
     }
 
     private void Start(){
+        sanityHandler=this.transform.parent.GetChild(2).gameObject.GetComponent<SanityHandler>();
         slidingController=GetComponent<SlidingController>();
-        cameraController=GetComponent<CameraController>();
         rigidbody=GetComponent<Rigidbody>();
         rigidbody.freezeRotation=true;
 
@@ -97,8 +107,7 @@ public class PlayerController:MonoBehaviour{
         runSpeed=walkSpeed*1.5f;
         crouchSpeed=walkSpeed*0.5f;
 
-        playerHeldWeapon=Instantiate(playerWeapon);
-        playerHeldWeapon.GetComponent<RangedWeaponScript>().playerController=this;
+        playerHeldWeapon=Instantiate(playerWeapon,this.transform);
     }
 
     private void Update(){
@@ -354,5 +363,9 @@ public class PlayerController:MonoBehaviour{
 
             break;
         }
+    }
+
+    public bool CurrentMadnessState(){
+        return sanityHandler.isInMadness;
     }
 }
