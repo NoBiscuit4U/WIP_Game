@@ -7,4 +7,8 @@ public class MadnessObjectCollisionHandler:MonoBehaviour{
     void Update(){
         
     }
+
+    void OnTriggerEnter(Collider other){
+        
+    }
 }
