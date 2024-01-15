@@ -360,12 +360,19 @@ public class PlayerController:MonoBehaviour{
 
             break;
             case AirStates.GROUNDED:
-
             break;
         }
     }
 
     public bool CurrentMadnessState(){
         return sanityHandler.isInMadness;
+    }
+
+    void OnTriggerEnter(Collider other){
+        if(other.gameObject.layer==LayerMask.NameToLayer("Madness")&&!sanityHandler.isInMadness){
+            this.gameObject.layer=LayerMask.NameToLayer("Player");
+        }else{
+            this.gameObject.layer=LayerMask.NameToLayer("PlayerInMadness");
+        }
     }
 }

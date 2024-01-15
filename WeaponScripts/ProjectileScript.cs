@@ -41,7 +41,7 @@ public class ProjectileScript:MonoBehaviour{
             Destroy(this.gameObject);
 
         }else if(collision.gameObject.layer==LayerMask.NameToLayer("Madness")){
-            if(canCollide){
+            if(isInMadness){
                 MeshRenderer meshRenderer=collision.gameObject.GetComponent<MeshRenderer>();
                 Material material=meshRenderer.materials[0];
 
@@ -64,31 +64,10 @@ public class ProjectileScript:MonoBehaviour{
     }
 
     void OnTriggerEnter(Collider other){
-        if(other.gameObject.layer==LayerMask.NameToLayer("Madness")){
-            Debug.Log("Detected Other Collider");
-            objectCheck=true;
+        if(other.gameObject.layer==LayerMask.NameToLayer("Madness")&&!isInMadness){
+            this.gameObject.layer=LayerMask.NameToLayer("Projectile");
         }else{
-            objectCheck=false;
-        }
-
-        HandleMadnessCollision();
-    }
-
-    private void HandleMadnessCollision(){
-        if(objectCheck==true&&!isInMadness){
-            Debug.Log("Passing Through Object");
-            rigidbody.detectCollisions=false;
-            canCollide=false;
-
-        }else if(objectCheck==true&&isInMadness){
-            Debug.Log("Can Collide"+objectCheck+isInMadness);
-            canCollide=true;
-            rigidbody.detectCollisions=true;
-
-        }else{
-            canCollide=true;
-            rigidbody.detectCollisions=true;
-
+            this.gameObject.layer=LayerMask.NameToLayer("ProjectileGhost");
         }
     }
 }
