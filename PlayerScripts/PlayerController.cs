@@ -7,7 +7,6 @@ public class PlayerController:MonoBehaviour{
     private CapsuleCollider collider;
 
     public CameraController cameraController;
-
     SlidingController slidingController;
     SanityHandler sanityHandler;
 
@@ -95,6 +94,7 @@ public class PlayerController:MonoBehaviour{
     private void Start(){
         sanityHandler=this.transform.parent.GetChild(2).gameObject.GetComponent<SanityHandler>();
         slidingController=GetComponent<SlidingController>();
+
         rigidbody=GetComponent<Rigidbody>();
         rigidbody.freezeRotation=true;
 

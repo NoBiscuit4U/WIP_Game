@@ -7,12 +7,6 @@ public class ProjectileSpawner:MonoBehaviour{
 
     public Transform currentOrientation;
 
-    private void Start(){
-    }
-    
-    private void Update(){
-    }
-
     public void SpawnProjectile(RangedWeaponScript RWScript,float numOfProj,float numOfBarrels,Transform[] spawnPos){
         numOfProj=RWScript.numberOfProj;
 

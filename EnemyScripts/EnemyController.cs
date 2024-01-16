@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyController:MonoBehaviour{
-    private EnemyStats enemyStats;
+    EnemyStats enemyStats;
+    EnemyPathFinder enemyPathFinder;
 
-    [Header("Enemy Status State")]
+    [Header("Enemy Aggro")]
+    public EnemyAggroStates currentAggroState;
+
+    public enum EnemyAggroStates{
+        DORMANT,WANDERING,SEEKING
+    }
+
+    [Header("Enemy Status")]
     public EnemyStatusStates currentStatusState;
 
     public enum EnemyStatusStates{
@@ -17,11 +25,14 @@ public class EnemyController:MonoBehaviour{
 
     private void Start(){
         enemyStats=GetComponent<EnemyStats>();
+        enemyPathFinder=GetComponent<EnemyPathFinder>();
+
     }
 
     private void Update(){
         EnemyStatusStateHandler();
-        BaseEnemyStateMachine();
+        EnemyStatusStateMachine();
+        EnemyAggroStateMachine();
     }
 
     private void HandleDeath(){
@@ -35,10 +46,9 @@ public class EnemyController:MonoBehaviour{
         }else{
             currentStatusState=EnemyStatusStates.DEAD;
         }
-
     }
 
-    private void BaseEnemyStateMachine(){
+    private void EnemyStatusStateMachine(){
         switch(currentStatusState){
             case EnemyStatusStates.ALIVE:
             break;
@@ -46,6 +56,16 @@ public class EnemyController:MonoBehaviour{
             HandleDeath();
             break;
         }
+    }
 
+    private void EnemyAggroStateMachine(){
+        switch(currentAggroState){
+            case EnemyAggroStates.DORMANT:
+            break;
+            case EnemyAggroStates.WANDERING:
+            break;
+            case EnemyAggroStates.SEEKING:
+            break;
+        }
     }
 }

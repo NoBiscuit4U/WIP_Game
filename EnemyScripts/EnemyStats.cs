@@ -7,7 +7,10 @@ public class EnemyStats:MonoBehaviour{
     public float maxHP;
     public float HP;
     public float DP;
-    public float speed;
+    public float speed=20;
+    public float turnSpeed=3;
+	public float turnDst=5;
+	public float stoppingDst=10;
 
     private void Start(){
         maxHP=HP;
