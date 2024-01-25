@@ -4,7 +4,16 @@ using UnityEngine;
 
 public class EnemyController:MonoBehaviour{
     EnemyStats enemyStats;
-    EnemyPathFinder enemyPathFinder;
+    EnemyMovementHandler enemyMovement;
+    EnemySurroundingsCheck enemyDetection;
+
+    bool hasStartedWandering=false;
+
+    [Header("Targets and CurrentPos")]
+	public Transform[] playerTargets;
+	public Transform[] wanderingTargets;
+    public Transform enemyCurrentPos;
+	public Transform target;
 
     [Header("Enemy Aggro")]
     public EnemyAggroStates currentAggroState;
@@ -13,25 +22,20 @@ public class EnemyController:MonoBehaviour{
         DORMANT,WANDERING,SEEKING
     }
 
-    [Header("Enemy Status")]
-    public EnemyStatusStates currentStatusState;
-
-    public enum EnemyStatusStates{
-        ALIVE,DEAD
-    }
-
     [Header("Enemy Effects")]
     public GameObject onDeathEffect;
 
     private void Start(){
         enemyStats=GetComponent<EnemyStats>();
-        enemyPathFinder=GetComponent<EnemyPathFinder>();
-
+        enemyDetection=this.transform.GetChild(0).GetComponent<EnemySurroundingsCheck>();
+        enemyMovement=GetComponent<EnemyMovementHandler>();
     }
 
     private void Update(){
-        EnemyStatusStateHandler();
-        EnemyStatusStateMachine();
+        if(enemyStats.HP<=0){
+            HandleDeath();
+        }
+
         EnemyAggroStateMachine();
     }
 
@@ -39,33 +43,54 @@ public class EnemyController:MonoBehaviour{
         Instantiate(onDeathEffect,this.transform.position,Quaternion.identity);
         Destroy(this.gameObject);
     }
-
-    private void EnemyStatusStateHandler(){
-        if(enemyStats.HP>0){
-            currentStatusState=EnemyStatusStates.ALIVE;
-        }else{
-            currentStatusState=EnemyStatusStates.DEAD;
-        }
-    }
-
-    private void EnemyStatusStateMachine(){
-        switch(currentStatusState){
-            case EnemyStatusStates.ALIVE:
-            break;
-            case EnemyStatusStates.DEAD:
-            HandleDeath();
-            break;
-        }
-    }
-
+    
     private void EnemyAggroStateMachine(){
         switch(currentAggroState){
             case EnemyAggroStates.DORMANT:
+            enemyMovement.StateToIdle();
+            StartWanderingRoutine(true);
             break;
             case EnemyAggroStates.WANDERING:
+            enemyMovement.SetTarget(target);
+            enemyMovement.StateToSeeking();
+            StartWanderingRoutine(false);
             break;
             case EnemyAggroStates.SEEKING:
+            enemyMovement.SetTarget(target);
+            enemyMovement.StateToSeeking();
+            StartWanderingRoutine(true);
             break;
         }
+    }
+    
+    private void StartWanderingRoutine(bool stop){
+        if(hasStartedWandering==false){
+            hasStartedWandering=true;
+            StartCoroutine(HandleEnemyWandering());
+        }
+
+        if(stop==true){
+            hasStartedWandering=false;
+            StopCoroutine(HandleEnemyWandering());
+        }
+    }
+
+    private IEnumerator HandleEnemyWandering(){
+        for(int i=0;i<wanderingTargets.Length;){
+            target=wanderingTargets[i];
+            yield return new WaitForSeconds(0.01f);
+
+            if(enemyCurrentPos.position.x==wanderingTargets[i].position.x&&enemyCurrentPos.position.z==wanderingTargets[i].position.z){
+                i++;
+            }
+
+            if(i==wanderingTargets.Length){
+                hasStartedWandering=false;
+            }
+        }
+    }
+
+    private void HandlePlayerTargeting(){
+
     }
 }

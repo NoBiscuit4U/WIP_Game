@@ -8,7 +8,8 @@ public class EnemyStats:MonoBehaviour{
     public float HP;
     public float DP;
     public float speed=20;
-    public float turnSpeed=3;
+    public float turnSpeed=200;
+    public float acceleration=0;
 	public float turnDst=5;
 	public float stoppingDst=10;
 
