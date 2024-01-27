@@ -8,6 +8,7 @@ public class EnemyController:MonoBehaviour{
     EnemySurroundingsCheck enemyDetection;
 
     bool hasStartedWandering=false;
+    bool isAttackingPlayer;
 
     [Header("Targets and CurrentPos")]
 	public Transform[] playerTargets;
@@ -36,6 +37,10 @@ public class EnemyController:MonoBehaviour{
             HandleDeath();
         }
 
+        if(isAttackingPlayer&&IsInAttackRange()){
+
+        }
+
         EnemyAggroStateMachine();
     }
 
@@ -56,6 +61,8 @@ public class EnemyController:MonoBehaviour{
             StartWanderingRoutine(false);
             break;
             case EnemyAggroStates.SEEKING:
+            HandlePlayerTargeting();
+            isAttackingPlayer=true;
             enemyMovement.SetTarget(target);
             enemyMovement.StateToSeeking();
             StartWanderingRoutine(true);
@@ -91,6 +98,16 @@ public class EnemyController:MonoBehaviour{
     }
 
     private void HandlePlayerTargeting(){
+        target=playerTargets[0]; 
+    }
 
+    private bool IsInAttackRange(){
+        //if(){
+        //    return true;
+        //}else{
+        //    return false;
+        //}
+
+        return true;
     }
 }

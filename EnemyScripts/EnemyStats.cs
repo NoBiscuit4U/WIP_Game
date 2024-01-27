@@ -12,6 +12,7 @@ public class EnemyStats:MonoBehaviour{
     public float acceleration=0;
 	public float turnDst=5;
 	public float stoppingDst=10;
+    public float attackRange=10;
 
     private void Start(){
         maxHP=HP;

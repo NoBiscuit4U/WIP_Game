@@ -14,6 +14,10 @@ public class PlayerController:MonoBehaviour{
     public Transform weaponHoldPos;
     public Transform weaponHoldRot;
 
+    [Header("Player Stats")]
+    public float maxHP;
+    public float currentHP;
+
     [Header("Movement Vars")]
     public float speed;
     public float walkSpeed;
@@ -111,6 +115,8 @@ public class PlayerController:MonoBehaviour{
     }
 
     private void Update(){
+        currentHP=Mathf.Clamp(currentHP,0,maxHP);
+
         weaponTransform=playerHeldWeapon.transform;
         SetMovementState();
         HandleAirState();
@@ -374,5 +380,13 @@ public class PlayerController:MonoBehaviour{
         }else{
             this.gameObject.layer=LayerMask.NameToLayer("PlayerInMadness");
         }
+    }
+
+    public float GetPlayerMaxHP(){
+        return maxHP;
+    }
+
+    public float GetCurrentPlayerHP(){
+        return currentHP;
     }
 }
