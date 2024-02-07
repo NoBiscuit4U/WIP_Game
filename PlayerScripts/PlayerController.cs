@@ -389,4 +389,8 @@ public class PlayerController:MonoBehaviour{
     public float GetCurrentPlayerHP(){
         return currentHP;
     }
+
+    public void ChangeHP(float changeValue){
+        currentHP=currentHP-changeValue;
+    }
 }

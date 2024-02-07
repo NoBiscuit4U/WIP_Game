@@ -19,5 +19,6 @@ public class UIHandler:MonoBehaviour{
 
     private void GetPlayerInfo(){
         playerHPSlider.maxValue=playerController.GetPlayerMaxHP();
+        playerHPSlider.maxValue=playerController.GetPlayerMaxHP();
     }
 }

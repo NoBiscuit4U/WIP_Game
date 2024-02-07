@@ -9,9 +9,9 @@ public class EnemyMovementHandler:MonoBehaviour{
 
     Rigidbody rigidbody;
 
-    Transform currentTarget;
+    NavMeshAgent agent;
 
-    public NavMeshAgent agent;
+    public Transform currentTarget;
 
     bool isInRange;
 
@@ -24,13 +24,14 @@ public class EnemyMovementHandler:MonoBehaviour{
 
     private void Start(){
         enemyStats=GetComponent<EnemyStats>();
-        enemyDetection=this.transform.GetChild(0).GetComponent<EnemySurroundingsCheck>();
         agent=GetComponent<NavMeshAgent>();
 
         agent.speed=enemyStats.speed;
         agent.angularSpeed=enemyStats.turnSpeed;
         agent.acceleration=enemyStats.acceleration;
         agent.stoppingDistance=enemyStats.stoppingDst;
+
+        currentTarget=this.transform;
 
         rigidbody=this.GetComponent<Rigidbody>();
     }
@@ -39,9 +40,10 @@ public class EnemyMovementHandler:MonoBehaviour{
         EnemyMovementStateMachine();
     }
 
-    public void EnemyMovementStateMachine(){
+    private void EnemyMovementStateMachine(){
         switch(currentMovementState){
             case EnemyMovementStates.IDLE:
+            agent.SetDestination(this.transform.position);
             break;
             case EnemyMovementStates.SEEKINGTARGET:
             agent.SetDestination(currentTarget.position);
@@ -59,6 +61,13 @@ public class EnemyMovementHandler:MonoBehaviour{
 
     public void SetTarget(Transform target){
         currentTarget=target;
+    }
+
+    public void LookAtTarget(){
+        Vector3 newPosition=currentTarget.position;
+        newPosition.y=this.transform.position.y;
+
+        this.transform.LookAt(newPosition);
     }
 
 }

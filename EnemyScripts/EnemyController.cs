@@ -6,13 +6,16 @@ public class EnemyController:MonoBehaviour{
     EnemyStats enemyStats;
     EnemyMovementHandler enemyMovement;
     EnemySurroundingsCheck enemyDetection;
+    PlayerController player;
 
-    bool hasStartedWandering=false;
-    bool isAttackingPlayer;
+    bool hasStartedSetWandering=false;
+    bool hasStartedRandomWandering=false;
+    public bool isAttackingPlayer;
 
     [Header("Targets and CurrentPos")]
 	public Transform[] playerTargets;
-	public Transform[] wanderingTargets;
+	public Transform[] setWanderingTargets;
+    public Transform randomWanderingTarget;
     public Transform enemyCurrentPos;
 	public Transform target;
 
@@ -27,9 +30,9 @@ public class EnemyController:MonoBehaviour{
     public GameObject onDeathEffect;
 
     private void Start(){
-        enemyStats=GetComponent<EnemyStats>();
-        enemyDetection=this.transform.GetChild(0).GetComponent<EnemySurroundingsCheck>();
-        enemyMovement=GetComponent<EnemyMovementHandler>();
+        enemyStats=this.GetComponent<EnemyStats>();
+        enemyMovement=this.GetComponent<EnemyMovementHandler>();
+        enemyDetection=this.GetComponent<EnemySurroundingsCheck>();
     }
 
     private void Update(){
@@ -38,7 +41,8 @@ public class EnemyController:MonoBehaviour{
         }
 
         if(isAttackingPlayer&&IsInAttackRange()){
-
+            player=target.transform.GetComponent<PlayerController>();
+            player.ChangeHP(10);
         }
 
         EnemyAggroStateMachine();
@@ -52,49 +56,87 @@ public class EnemyController:MonoBehaviour{
     private void EnemyAggroStateMachine(){
         switch(currentAggroState){
             case EnemyAggroStates.DORMANT:
+            isAttackingPlayer=false;
             enemyMovement.StateToIdle();
-            StartWanderingRoutine(true);
             break;
             case EnemyAggroStates.WANDERING:
-            enemyMovement.SetTarget(target);
+            isAttackingPlayer=false;
             enemyMovement.StateToSeeking();
-            StartWanderingRoutine(false);
+            enemyMovement.SetTarget(target);
+            StartRandomWanderingRoutine();
             break;
             case EnemyAggroStates.SEEKING:
             HandlePlayerTargeting();
             isAttackingPlayer=true;
-            enemyMovement.SetTarget(target);
             enemyMovement.StateToSeeking();
-            StartWanderingRoutine(true);
+            enemyMovement.SetTarget(target);
             break;
         }
     }
     
-    private void StartWanderingRoutine(bool stop){
-        if(hasStartedWandering==false){
-            hasStartedWandering=true;
-            StartCoroutine(HandleEnemyWandering());
+    private void StartSetWanderingRoutine(bool stop){
+        if(hasStartedSetWandering==false){
+            hasStartedSetWandering=true;
+            target=randomWanderingTarget;
+            StartCoroutine(EnemyFollowSetPath());
         }
 
         if(stop==true){
-            hasStartedWandering=false;
-            StopCoroutine(HandleEnemyWandering());
+            hasStartedSetWandering=false;
+            StopCoroutine(EnemyFollowSetPath());
         }
     }
 
-    private IEnumerator HandleEnemyWandering(){
-        for(int i=0;i<wanderingTargets.Length;){
-            target=wanderingTargets[i];
-            yield return new WaitForSeconds(0.01f);
+    private void StartRandomWanderingRoutine(){
+        if(!hasStartedRandomWandering){
+            hasStartedRandomWandering=true;
+            StartCoroutine(SetNewWanderingTarget(100));
+            target=randomWanderingTarget;
+        }
+    }
 
-            if(enemyCurrentPos.position.x==wanderingTargets[i].position.x&&enemyCurrentPos.position.z==wanderingTargets[i].position.z){
+    private IEnumerator EnemyFollowSetPath(){
+        yield return new WaitForSeconds(0.01f);
+        for(int i=0;i<setWanderingTargets.Length;){
+            target=setWanderingTargets[i];
+
+            if(enemyCurrentPos.position.x==setWanderingTargets[i].position.x&&enemyCurrentPos.position.z==setWanderingTargets[i].position.z){
                 i++;
             }
 
-            if(i==wanderingTargets.Length){
-                hasStartedWandering=false;
+            if(i==setWanderingTargets.Length){
+                hasStartedSetWandering=false;
             }
         }
+    }
+
+    private IEnumerator SetNewWanderingTarget(float newTargetRange){
+		bool isWalkable=false;
+
+		randomWanderingTarget.position=NewWanderingTargetPos(newTargetRange);
+
+		while(!isWalkable){
+			Vector3 newPos=NewWanderingTargetPos(newTargetRange);
+			bool checkIfWalkable=Physics.Raycast(newPos,Vector3.down,2f,3);
+			yield return new WaitForSeconds(0.01f);
+
+			if(checkIfWalkable){
+				randomWanderingTarget.transform.position=newPos;
+				isWalkable=true;
+                hasStartedRandomWandering=false;
+				StopCoroutine(SetNewWanderingTarget(newTargetRange));
+			}
+		}
+	}
+
+    public Vector3 NewWanderingTargetPos(float newTargetRange){
+        float randomTargetX=Random.Range(-newTargetRange,newTargetRange);
+        float randomTargetY=Random.Range(-newTargetRange,newTargetRange);
+        float randomTargetZ=Random.Range(-newTargetRange,newTargetRange);
+
+        Vector3 newTargetPos=new Vector3(enemyCurrentPos.position.x+randomTargetX,enemyCurrentPos.position.y,enemyCurrentPos.position.z+randomTargetZ);
+
+        return newTargetPos;
     }
 
     private void HandlePlayerTargeting(){
@@ -102,12 +144,16 @@ public class EnemyController:MonoBehaviour{
     }
 
     private bool IsInAttackRange(){
-        //if(){
-        //    return true;
-        //}else{
-        //    return false;
-        //}
+        bool returnValue=false;
+        if(Mathf.Abs(enemyCurrentPos.position.x)<=Mathf.Abs(target.position.x)+enemyStats.attackRange&&
+                                                  Mathf.Abs(enemyCurrentPos.position.y)<=Mathf.Abs(target.position.y)+enemyStats.attackRange&&isPlayerVisible()){
+            returnValue=true;
+        }
 
-        return true;
+        return returnValue;
+    }
+
+    public bool isPlayerVisible(){
+        return enemyDetection.IsPlayerInView(target);
     }
 }

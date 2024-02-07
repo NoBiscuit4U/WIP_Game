@@ -10,7 +10,6 @@ public class EnemyStats:MonoBehaviour{
     public float speed=20;
     public float turnSpeed=200;
     public float acceleration=0;
-	public float turnDst=5;
 	public float stoppingDst=10;
     public float attackRange=10;
 
