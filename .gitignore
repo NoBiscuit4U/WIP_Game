@@ -5,6 +5,7 @@
 *.meta
 
 # Package Files #
+*.meta
 *.jar
 *.war
 *.nar

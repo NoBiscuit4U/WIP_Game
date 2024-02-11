@@ -110,9 +110,7 @@ public class RangedWeaponScript:MonoBehaviour{
         sightModule.transform.position=sightAttachPoint.position;
     }
 
-    private void GetAmmuntionStats(){
-        
-    }
+    private void GetAmmuntionStats(){}
 
     public void RecoilForce(){
         float recoilForce=recoil-weaponStability;

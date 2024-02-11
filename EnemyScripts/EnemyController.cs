@@ -19,7 +19,7 @@ public class EnemyController:MonoBehaviour{
     public Transform enemyCurrentPos;
 	public Transform target;
 
-    [Header("Enemy Aggro")]
+    [Header("Enemy Aggro State")]
     public EnemyAggroStates currentAggroState;
 
     public enum EnemyAggroStates{
@@ -29,7 +29,7 @@ public class EnemyController:MonoBehaviour{
     [Header("Enemy Effects")]
     public GameObject onDeathEffect;
 
-    private void Start(){
+    private void Start(){  
         enemyStats=this.GetComponent<EnemyStats>();
         enemyMovement=this.GetComponent<EnemyMovementHandler>();
         enemyDetection=this.GetComponent<EnemySurroundingsCheck>();
@@ -130,9 +130,9 @@ public class EnemyController:MonoBehaviour{
 	}
 
     public Vector3 NewWanderingTargetPos(float newTargetRange){
-        float randomTargetX=Random.Range(-newTargetRange,newTargetRange);
+        float randomTargetX=Random.Range(-newTargetRange,newTargetRange); 
         float randomTargetY=Random.Range(-newTargetRange,newTargetRange);
-        float randomTargetZ=Random.Range(-newTargetRange,newTargetRange);
+        float randomTargetZ=Random.Range(-newTargetRange,newTargetRange); 
 
         Vector3 newTargetPos=new Vector3(enemyCurrentPos.position.x+randomTargetX,enemyCurrentPos.position.y,enemyCurrentPos.position.z+randomTargetZ);
 
@@ -144,7 +144,7 @@ public class EnemyController:MonoBehaviour{
     }
 
     private bool IsInAttackRange(){
-        bool returnValue=false;
+        bool returnValue=false; 
         if(Mathf.Abs(enemyCurrentPos.position.x)<=Mathf.Abs(target.position.x)+enemyStats.attackRange&&
                                                   Mathf.Abs(enemyCurrentPos.position.y)<=Mathf.Abs(target.position.y)+enemyStats.attackRange&&isPlayerVisible()){
             returnValue=true;
